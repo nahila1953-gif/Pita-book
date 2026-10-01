@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Pita Bakery — Customer Books</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--gold:#e8b64c;--cream:#fff8ea;--bg:#14100b;--bg2:#1e1712;--card:#241c14;--dim:#cdbfa4;--faint:#8d7f66;--green:#7bc98a;--red:#e07a6a}
+body{background:var(--bg);color:var(--cream);font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;min-height:100vh;padding-bottom:86px}
+header{position:sticky;top:0;z-index:20;background:rgba(20,16,11,.96);border-bottom:1px solid rgba(232,182,76,.25);padding:14px 18px}
+header h1{font-size:19px;letter-spacing:.5px}
+header h1 span{color:var(--gold)}
+header p{font-size:12px;color:var(--faint);letter-spacing:2px;text-transform:uppercase;margin-top:2px}
+main{padding:16px;max-width:640px;margin:0 auto}
+section.tab{display:none}
+section.tab.active{display:block}
+.search{width:100%;padding:14px 16px;font-size:17px;border-radius:12px;border:1px solid rgba(232,182,76,.3);background:var(--card);color:var(--cream);margin-bottom:12px}
+.cust{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid rgba(232,182,76,.18);border-radius:12px;padding:15px 16px;margin-bottom:10px;cursor:pointer}
+.cust:active{background:#2c2318}
+.cust .nm{font-size:18px;font-weight:700}
+.cust .id{font-size:12px;color:var(--faint);margin-top:2px}
+.cust .bal{font-size:15px;color:var(--gold);font-weight:700;text-align:right}
+.panel{background:var(--card);border:1px solid rgba(232,182,76,.3);border-radius:14px;padding:20px;margin-bottom:12px}
+.panel h2{font-size:22px;margin-bottom:4px}
+.panel .sub{color:var(--faint);font-size:13px;margin-bottom:16px}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.chip{flex:1;min-width:120px;padding:14px;border-radius:12px;border:2px solid rgba(232,182,76,.3);background:var(--bg2);color:var(--cream);font-size:16px;font-weight:700;cursor:pointer;text-align:center}
+.chip small{display:block;font-size:12px;color:var(--faint);font-weight:400;margin-top:3px}
+.chip.sel{border-color:var(--gold);background:#33270f}
+.stepper{display:flex;align-items:center;justify-content:center;gap:22px;margin:8px 0 20px}
+.stepper button{width:64px;height:64px;border-radius:50%;border:2px solid var(--gold);background:var(--bg2);color:var(--gold);font-size:30px;font-weight:700;cursor:pointer}
+.stepper .qv{font-size:44px;font-weight:800;min-width:80px;text-align:center}
+.bigbtn{width:100%;padding:18px;border:none;border-radius:14px;background:var(--gold);color:#1a1208;font-size:19px;font-weight:800;cursor:pointer}
+.bigbtn:active{transform:scale(.98)}
+.ghostbtn{width:100%;padding:14px;border:1px solid var(--gold);border-radius:14px;background:transparent;color:var(--gold);font-size:16px;font-weight:700;cursor:pointer;margin-top:10px}
+.backbtn{background:none;border:none;color:var(--gold);font-size:16px;font-weight:700;padding:6px 0 14px;cursor:pointer}
+.toast{position:fixed;left:16px;right:16px;bottom:96px;background:#2c2318;border:1px solid var(--gold);color:var(--cream);border-radius:12px;padding:16px;text-align:center;font-size:16px;font-weight:600;display:none;z-index:50}
+.toast.show{display:block}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{text-align:left;color:var(--gold);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 8px;border-bottom:1px solid rgba(232,182,76,.3)}
+td{padding:11px 8px;border-bottom:1px solid rgba(232,182,76,.12)}
+tr.paid td{opacity:.55}
+.paidtag{font-size:11px;background:#2c4a2e;color:var(--green);border-radius:20px;padding:3px 10px;font-weight:700}
+.markpaid{background:none;border:1px solid var(--green);color:var(--green);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer}
+.totalbar{display:flex;justify-content:space-between;background:var(--card);border:1px solid var(--gold);border-radius:12px;padding:16px;margin:14px 0;font-size:18px;font-weight:800}
+.totalbar span:last-child{color:var(--gold)}
+.hrow{display:flex;justify-content:space-between;padding:10px 4px;border-bottom:1px solid rgba(232,182,76,.12);font-size:15px}
+.hrow .t{color:var(--faint);font-size:13px}
+input.txt{width:100%;padding:14px;font-size:16px;border-radius:12px;border:1px solid rgba(232,182,76,.3);background:var(--bg2);color:var(--cream);margin-bottom:10px}
+.row2{display:flex;gap:10px}
+.row2 input{flex:1}
+nav.tabs{position:fixed;bottom:0;left:0;right:0;background:rgba(20,16,11,.97);border-top:1px solid rgba(232,182,76,.25);display:flex;z-index:20}
+nav.tabs button{flex:1;background:none;border:none;color:var(--faint);font-size:11px;font-weight:700;padding:12px 4px 14px;cursor:pointer;letter-spacing:.5px}
+nav.tabs button.on{color:var(--gold)}
+nav.tabs button .ic{font-size:21px;display:block;margin-bottom:3px}
+.empty{text-align:center;color:var(--faint);padding:40px 10px;font-size:15px}
+h3.sec{color:var(--gold);font-size:13px;letter-spacing:2px;text-transform:uppercase;margin:20px 0 10px}
+.danger{color:var(--red);border-color:var(--red)}
+.note{font-size:13px;color:var(--faint);margin-top:12px;line-height:1.5}
+</style>
+</head>
+<body>
+<header><h1>Mediterranean <span>Pita Bakery</span></h1><p>Customer Books</p></header>
+<main>
+<!-- RECORD -->
+<section class="tab active" id="tab-record">
+  <div id="recList">
+    <div id="missBanner" style="display:none;background:#3a2a10;border:1px solid var(--gold);border-radius:12px;padding:14px 16px;margin-bottom:12px;font-size:15px;cursor:pointer"></div>
+    <button class="bigbtn" id="micBtn" onclick="startVoice()" style="margin-bottom:12px">🎤 Tap &amp; talk</button>
+    <div id="voicePanel" class="panel" style="display:none"></div>
+    <input class="search" id="q" placeholder="Search customer…" oninput="renderCustList()">
+    <div id="custList"></div>
+    <button class="ghostbtn" onclick="goTab('customers')">+ Add new customer</button>
+  </div>
+  <div id="recDetail" style="display:none">
+    <button class="backbtn" onclick="showRecList()">← All customers</button>
+    <div class="panel">
+      <h2 id="rdName"></h2><div class="sub" id="rdSub"></div>
+      <h3 class="sec">Box type</h3>
+      <div class="chips" id="rdChips"></div>
+      <h3 class="sec">Quantity</h3>
+      <div class="stepper">
+        <button onclick="chQty(-1)">−</button><div class="qv" id="rdQty">1</div><button onclick="chQty(1)">+</button>
+      </div>
+      <button class="bigbtn" onclick="savePickup()">Record pickup</button>
+    </div>
+  </div>
+</section>
+<!-- TODAY -->
+<section class="tab" id="tab-today">
+  <div class="totalbar"><span>Boxes today</span><span id="todayTotal">0</span></div>
+  <div id="missList"></div>
+  <div id="todayList"></div>
+</section>
+<!-- MONTH -->
+<section class="tab" id="tab-month">
+  <div class="row2">
+    <input class="txt" type="month" id="mPick" onchange="renderMonth()">
+  </div>
+  <div class="totalbar"><span>Month total</span><span id="monthTotal">$0</span></div>
+  <div id="monthList"></div>
+</section>
+<!-- CUSTOMERS -->
+<section class="tab" id="tab-customers">
+  <div class="panel">
+    <h2>Add customer</h2><div class="sub">They get a QR card with their ID</div>
+    <input class="txt" id="ncName" placeholder="Customer name">
+    <input class="txt" id="ncPhone" placeholder="Phone (optional)">
+    <button class="bigbtn" onclick="addCustomer()">Add customer</button>
+  </div>
+  <div id="allCust"></div>
+</section>
+<!-- SETTINGS -->
+<section class="tab" id="tab-settings">
+  <div class="panel">
+    <h2>Box types &amp; prices</h2><div class="sub">Used for the month-end bill</div>
+    <div id="boxList"></div>
+    <div class="row2" style="margin-top:10px">
+      <input class="txt" id="nbName" placeholder="New type (e.g. Family)">
+      <input class="txt" id="nbPrice" placeholder="Price" inputmode="decimal" style="max-width:110px">
+    </div>
+    <button class="ghostbtn" onclick="addBoxType()">+ Add box type</button>
+  </div>
+  <div class="panel">
+    <h2>Voice language</h2><div class="sub">For the 🎤 Tap &amp; talk button</div>
+    <div class="chips"><div class="chip" id="vlEn" onclick="setVLang('en')">English</div><div class="chip" id="vlAr" onclick="setVLang('ar')">عربي</div></div>
+  </div>
+  <div class="panel">
+    <h2>Backup</h2><div class="sub">Keep a copy somewhere safe</div>
+    <button class="ghostbtn" onclick="exportData()">Download backup</button>
+    <button class="ghostbtn" onclick="document.getElementById('imp').click()">Restore from backup</button>
+    <input type="file" id="imp" accept=".json" style="display:none" onchange="importData(event)">
+    <p class="note">Everything is saved on this phone. If the phone is lost or the browser data is cleared, restore from a backup file.</p>
+  </div>
+  <div class="panel">
+    <h2>Demo data</h2>
+    <button class="ghostbtn danger" onclick="resetDemo()">Reset to demo customers</button>
+  </div>
+</section>
+</main>
+<div class="toast" id="toast"></div>
+<nav class="tabs">
+  <button class="on" onclick="goTab('record')"><span class="ic">🧾</span>Record</button>
+  <button onclick="goTab('today')"><span class="ic">📅</span>Today</button>
+  <button onclick="goTab('month')"><span class="ic">🗓️</span>Month</button>
+  <button onclick="goTab('customers')"><span class="ic">👥</span>People</button>
+  <button onclick="goTab('settings')"><span class="ic">⚙️</span>Setup</button>
+</nav>
+<script>
+const K='mpb_books_v1';
+let DB=null, selCust=null, selBox=null, qty=1, vLang='en';
+function load(){try{DB=JSON.parse(localStorage.getItem(K))}catch(e){} if(!DB||!DB.customers){DB={seq:1,customers:[],boxTypes:[],pickups:[],paid:[]};seed();save();} vLang=DB.vLang||'en';}
+function save(){localStorage.setItem(K,JSON.stringify(DB))}
+function nid(p){return p+'-'+String(DB.seq++).padStart(3,'0')}
+function seed(){
+  DB.boxTypes=[{id:'BT-1',name:'Small box',price:5},{id:'BT-2',name:'Large box',price:9}];
+  const names=[['Ahmed K.','780-111-2233'],['Sara M.','780-222-3344'],['Omar H.','780-333-4455'],['Layla R.','780-444-5566']];
+  names.forEach(n=>DB.customers.push({id:nid('MPB'),name:n[0],phone:n[1]}));
+  const now=new Date();
+  const mk=(ci,bi,q,daysAgo,h)=>{const d=new Date(now);d.setDate(d.getDate()-daysAgo);d.setHours(h,15,0,0);DB.pickups.push({id:nid('PK'),customerId:DB.customers[ci].id,boxTypeId:DB.boxTypes[bi].id,qty:q,ts:d.getTime()})};
+  mk(0,0,2,0,9);mk(1,1,1,0,10);mk(2,0,5,0,11);mk(0,1,1,1,9);mk(3,0,3,1,12);mk(1,0,2,2,10);
+}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600)}
+function goTab(n){document.querySelectorAll('section.tab').forEach(s=>s.classList.remove('active'));document.getElementById('tab-'+n).classList.add('active');document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('on'));const i={record:0,today:1,month:2,customers:3,settings:4}[n];document.querySelectorAll('nav.tabs button')[i].classList.add('on');
+ if(n==='record'){renderCustList();renderMissing()}if(n==='today'){renderToday();renderMissing()}if(n==='month')renderMonth();if(n==='customers')renderAllCust();if(n==='settings'){renderBoxes();paintVLang()}}
+function custName(id){const c=DB.customers.find(c=>c.id===id);return c?c.name:'?'}
+function boxName(id){const b=DB.boxTypes.find(b=>b.id===id);return b?b.name:'?'}
+function boxPrice(id){const b=DB.boxTypes.find(b=>b.id===id);return b?+b.price:0}
+function monthKey(ts){const d=new Date(ts);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
+function todayKey(ts){const d=new Date(ts);return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate()}
+/* RECORD */
+function renderCustList(){const q=(document.getElementById('q').value||'').toLowerCase();const el=document.getElementById('custList');const list=DB.customers.filter(c=>c.name.toLowerCase().includes(q)||c.id.toLowerCase().includes(q));
+ el.innerHTML=list.length?list.map(c=>{const mtd=DB.pickups.filter(p=>p.customerId===c.id&&monthKey(p.ts)===monthKey(Date.now())).reduce((s,p)=>s+p.qty,0);
+ return `<div class="cust" onclick="openRec('${c.id}')"><div><div class="nm">${esc(c.name)}</div><div class="id">${c.id}</div></div><div class="bal">${mtd} boxes<br><span style="font-size:11px;color:var(--faint)">this month</span></div></div>`}).join(''):'<div class="empty">No customers found.</div>'}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function openRec(id){selCust=id;selBox=DB.boxTypes[0]?DB.boxTypes[0].id:null;qty=1;document.getElementById('recList').style.display='none';document.getElementById('recDetail').style.display='block';
+ const c=DB.customers.find(c=>c.id===id);document.getElementById('rdName').textContent=c.name;document.getElementById('rdSub').textContent=c.id+(c.phone?' · '+c.phone:'');renderChips();document.getElementById('rdQty').textContent=qty}
+function showRecList(){document.getElementById('recDetail').style.display='none';document.getElementById('recList').style.display='block';renderCustList()}
+function renderChips(){document.getElementById('rdChips').innerHTML=DB.boxTypes.map(b=>`<div class="chip${b.id===selBox?' sel':''}" onclick="selBox='${b.id}';renderChips()">${esc(b.name)}<small>$${b.price} each</small></div>`).join('')||'<div class="empty">Add box types in Setup.</div>'}
+function chQty(d){qty=Math.min(99,Math.max(1,qty+d));document.getElementById('rdQty').textContent=qty}
+function savePickup(){if(!selCust||!selBox){toast('Pick a customer and box type');return}
+ DB.pickups.push({id:nid('PK'),customerId:selCust,boxTypeId:selBox,qty:qty,ts:Date.now()});save();
+ toast(`Recorded: ${custName(selCust)} — ${qty} × ${boxName(selBox)}`);qty=1;document.getElementById('rdQty').textContent=qty;renderCustList()}
+/* TODAY */
+function renderToday(){const tk=todayKey(Date.now());const list=DB.pickups.filter(p=>todayKey(p.ts)===tk).sort((a,b)=>b.ts-a.ts);
+ const tot=list.reduce((s,p)=>s+p.qty,0);document.getElementById('todayTotal').textContent=tot+' boxes';
+ const byType={};list.forEach(p=>{byType[p.boxTypeId]=(byType[p.boxTypeId]||0)+p.qty});
+ let h=Object.keys(byType).length?'<div class="panel"><h2>By type</h2>'+Object.keys(byType).map(k=>`<div class="hrow"><span>${esc(boxName(k))}</span><b>${byType[k]}</b></div>`).join('')+'</div>':'';
+ h+=list.length?'<h3 class="sec">Pickups today</h3>'+list.map(p=>{const d=new Date(p.ts);return `<div class="hrow"><span><b>${esc(custName(p.customerId))}</b> — ${p.qty} × ${esc(boxName(p.boxTypeId))}</span><span class="t">${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span></div>`}).join(''):'<div class="empty">Nothing recorded today yet.</div>';
+ document.getElementById('todayList').innerHTML=h}
+/* MONTH */
+function renderMonth(){const inp=document.getElementById('mPick');if(!inp.value){const d=new Date();inp.value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
+ const mk=inp.value;const rows=DB.customers.map(c=>{const ps=DB.pickups.filter(p=>p.customerId===c.id&&monthKey(p.ts)===mk);
+  const boxes=ps.reduce((s,p)=>s+p.qty,0);const amt=ps.reduce((s,p)=>s+p.qty*boxPrice(p.boxTypeId),0);
+  const paid=DB.paid.some(x=>x.customerId===c.id&&x.month===mk);return{c,boxes,amt,paid,ps}}).filter(r=>r.boxes>0).sort((a,b)=>b.amt-a.amt);
+ const tot=rows.reduce((s,r)=>s+r.amt,0);document.getElementById('monthTotal').textContent='$'+tot.toFixed(2);
+ document.getElementById('monthList').innerHTML=rows.length?`<table><tr><th>Customer</th><th>Boxes</th><th>Owes</th><th></th></tr>${rows.map(r=>`<tr class="${r.paid?'paid':''}"><td><b>${esc(r.c.name)}</b><br><span style="font-size:12px;color:var(--faint)">${r.ps.map(p=>p.qty+'× '+esc(boxName(p.boxTypeId))).join(', ')}</span></td><td>${r.boxes}</td><td><b>$${r.amt.toFixed(2)}</b></td><td>${r.paid?'<span class="paidtag">PAID</span>':`<button class="markpaid" onclick="markPaid('${r.c.id}')">Mark paid</button>`}</td></tr>`).join('')}</table>`:'<div class="empty">No pickups this month.</div>'}
+function markPaid(cid){const mk=document.getElementById('mPick').value;DB.paid.push({customerId:cid,month:mk,ts:Date.now()});save();renderMonth();toast('Marked paid: '+custName(cid))}
+/* CUSTOMERS */
+function renderAllCust(){document.getElementById('allCust').innerHTML='<h3 class="sec">All customers ('+DB.customers.length+')</h3>'+DB.customers.map(c=>{const mtd=DB.pickups.filter(p=>p.customerId===c.id&&monthKey(p.ts)===monthKey(Date.now())).reduce((s,p)=>s+p.qty,0);
+ return `<div class="cust" onclick="custHist('${c.id}')"><div><div class="nm">${esc(c.name)}</div><div class="id">${c.id}${c.phone?' · '+esc(c.phone):''}</div></div><div class="bal">${mtd} boxes<br><span style="font-size:11px;color:var(--faint)">this month</span></div></div>`}).join('')}
+function addCustomer(){const n=document.getElementById('ncName').value.trim();if(!n){toast('Type a name first');return}
+ const ph=document.getElementById('ncPhone').value.trim();const c={id:nid('MPB'),name:n,phone:ph};DB.customers.push(c);save();
+ document.getElementById('ncName').value='';document.getElementById('ncPhone').value='';renderAllCust();toast('Added '+n+' — ID '+c.id)}
+function custHist(id){const c=DB.customers.find(c=>c.id===id);const ps=DB.pickups.filter(p=>p.customerId===id).sort((a,b)=>b.ts-a.ts).slice(0,30);
+ let h=`<button class="backbtn" onclick="renderAllCust()">← All customers</button><div class="panel"><h2>${esc(c.name)}</h2><div class="sub">${c.id}${c.phone?' · '+esc(c.phone):''}</div>`;
+ h+=ps.length?ps.map(p=>{const d=new Date(p.ts);return `<div class="hrow"><span>${p.qty} × ${esc(boxName(p.boxTypeId))}</span><span class="t">${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}</span></div>`}).join(''):'<div class="empty">No pickups yet.</div>';
+ document.getElementById('allCust').innerHTML=h+'</div>'}
+/* SETTINGS */
+function renderBoxes(){document.getElementById('boxList').innerHTML=DB.boxTypes.map(b=>`<div class="hrow"><span><b>${esc(b.name)}</b></span><span>$${b.price} <button class="markpaid" style="border-color:var(--red);color:var(--red);margin-left:8px" onclick="delBox('${b.id}')">remove</button></span></div>`).join('')||'<div class="empty">No box types.</div>'}
+function addBoxType(){const n=document.getElementById('nbName').value.trim();const pr=parseFloat(document.getElementById('nbPrice').value);if(!n||isNaN(pr)){toast('Name and price needed');return}
+ DB.boxTypes.push({id:nid('BT'),name:n,price:pr});save();document.getElementById('nbName').value='';document.getElementById('nbPrice').value='';renderBoxes();toast('Added '+n)}
+function delBox(id){if(!confirm('Remove this box type? Old records keep working.'))return;DB.boxTypes=DB.boxTypes.filter(b=>b.id!==id);save();renderBoxes()}
+function exportData(){const blob=new Blob([JSON.stringify(DB)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pita-bakery-backup.json';a.click();toast('Backup downloaded')}
+function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{DB=JSON.parse(r.result);save();goTab('record');toast('Backup restored')}catch(err){toast('Bad backup file')}};r.readAsText(f)}
+function resetDemo(){if(!confirm('Replace everything with demo customers?'))return;localStorage.removeItem(K);load();goTab('record');toast('Demo reset')}
+/* MISSING REGULARS — 2+ pickups in last 7 days, none today */
+function missingRegulars(){const now=Date.now(),day=864e5,tk=todayKey(now);
+ return DB.customers.filter(c=>{const ps=DB.pickups.filter(p=>p.customerId===c.id&&now-p.ts<7*day);
+  return ps.length>=2&&!ps.some(p=>todayKey(p.ts)===tk)}).map(c=>({c,last:Math.max(...DB.pickups.filter(p=>p.customerId===c.id).map(p=>p.ts))})).sort((a,b)=>b.last-a.last)}
+function renderMissing(){const m=missingRegulars();const b=document.getElementById('missBanner');
+ if(b){if(m.length){b.style.display='block';b.innerHTML=`⚠️ <b>${m.length} regular${m.length>1?'s':''}</b> no pickup today — <u>tap to review</u>`;b.onclick=()=>goTab('today')}else b.style.display='none'}
+ const el=document.getElementById('missList');if(!el)return;
+ el.innerHTML=m.length?'<h3 class="sec">⚠️ Regulars missing today</h3>'+m.map(x=>{const d=new Date(x.last);
+  return `<div class="cust"><div><div class="nm">${esc(x.c.name)}</div><div class="id">last pickup: ${d.getMonth()+1}/${d.getDate()}</div></div><button class="markpaid" onclick="openRec('${x.c.id}')">Record</button></div>`}).join(''):''}
+/* VOICE — tap mic, say e.g. "Omar three small boxes" */
+let recog=null;
+const NUMW={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,'واحد':1,'اثنان':2,'اثنين':2,'ثلاثة':3,'ثلاث':3,'أربعة':4,'اربعة':4,'اربعه':4,'خمسة':5,'خمسه':5,'ستة':6,'سته':6,'سبعة':7,'سبعه':7,'ثمانية':8,'ثمانيه':8,'تسعة':9,'تسعه':9,'عشرة':10,'عشره':10};
+function setVLang(l){vLang=l;DB.vLang=l;save();paintVLang()}
+function paintVLang(){const a=document.getElementById('vlEn'),b=document.getElementById('vlAr');if(!a||!b)return;a.classList.toggle('sel',vLang!=='ar');b.classList.toggle('sel',vLang==='ar')}
+function startVoice(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){toast('Voice needs Chrome browser');return}
+ if(recog){recog.stop();return}
+ recog=new SR();recog.lang=vLang==='ar'?'ar-SA':'en-US';recog.interimResults=false;
+ const btn=document.getElementById('micBtn');btn.textContent='🔴 Listening… tap to stop';btn.style.background='#e07a6a';
+ recog.onresult=e=>{handleVoice(e.results[0][0].transcript)};
+ recog.onend=()=>{recog=null;btn.innerHTML='🎤 Tap &amp; talk';btn.style.background=''};
+ recog.onerror=()=>{toast('Did not catch that — try again')};
+ recog.start()}
+function handleVoice(t){const low=t.toLowerCase();let qty=null;
+ const dm=low.match(/(\d+)/);if(dm)qty=parseInt(dm[1],10);
+ if(qty===null)for(const w in NUMW){if(low.includes(w)){qty=NUMW[w];break}}
+ qty=qty||1;
+ let box=DB.boxTypes[0]||null;
+ for(const b of DB.boxTypes){if(low.includes(b.name.toLowerCase().split(' ')[0])){box=b;break}}
+ const words=low.replace(/[^a-z\u0600-\u06FF0-9 ]/g,' ').split(/\s+/);
+ let best=null,bs=0;
+ DB.customers.forEach(c=>{let s=0;c.name.toLowerCase().split(/\s+/).forEach(w=>{if(w.length>1&&words.includes(w))s+=w.length});if(s>bs){bs=s;best=c}});
+ showVoiceConfirm(t,best,box,qty)}
+function showVoiceConfirm(t,cust,box,qty){const p=document.getElementById('voicePanel');p.style.display='block';
+ let h=`<h2>Did I hear right?</h2><div class="sub">"${esc(t)}"</div>`;
+ h+=cust?`<div class="hrow"><span>Customer</span><b>${esc(cust.name)}</b></div><div class="hrow"><span>Boxes</span><b>${qty} × ${esc(box?box.name:'?')}</b></div>
+ <button class="bigbtn" onclick="voiceConfirm('${cust.id}','${box?box.id:''}',${qty})">✓ Confirm</button>
+ <button class="ghostbtn" onclick="document.getElementById('voicePanel').style.display='none'">Cancel</button>`
+ :`<div class="empty">No customer matched that name.</div><button class="ghostbtn" onclick="document.getElementById('voicePanel').style.display='none'">OK</button>`;
+ p.innerHTML=h;p.scrollIntoView()}
+function voiceConfirm(cid,bid,q){if(!bid){toast('Add a box type in Setup first');return}
+ DB.pickups.push({id:nid('PK'),customerId:cid,boxTypeId:bid,qty:q,ts:Date.now()});save();
+ document.getElementById('voicePanel').style.display='none';
+ toast(`Recorded: ${custName(cid)} — ${q} × ${boxName(bid)}`);renderCustList();renderMissing()}
+/* QR deep link: ?c=MPB-001 opens that customer */
+(function(){const m=new URLSearchParams(location.search).get('c');load();if(m){const c=DB.customers.find(c=>c.id.toUpperCase()===m.toUpperCase());if(c){openRec(c.id);toast('Customer: '+c.name)}}renderCustList();renderMissing()})();
+</script>
+</body>
+</html>
